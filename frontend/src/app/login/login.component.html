@@ -1,0 +1,67 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Hi</h1>
+    </div>
+    
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <div class="input-container">
+          <i class="input-icon">✉</i>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            [(ngModel)]="email"
+            placeholder="Email*"
+            required
+            class="form-input"
+            #emailInput="ngModel"
+          >
+        </div>
+        <div class="input-underline"></div>
+        <div *ngIf="emailInput.invalid && emailInput.touched" class="error-text">
+          Email is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <i class="input-icon">🔒</i>
+          <input 
+            [type]="showPassword ? 'text' : 'password'"
+            id="password" 
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Password*"
+            required
+            class="form-input"
+            #passwordInput="ngModel"
+          >
+          <i 
+            class="password-toggle" 
+            (click)="togglePasswordVisibility()"
+            [class.visible]="showPassword"
+          >👁</i>
+        </div>
+        <div class="input-underline"></div>
+        <div *ngIf="passwordInput.invalid && passwordInput.touched" class="error-text">
+          Password is required
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="login-button"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">LOGIN</span>
+        <span *ngIf="isLoading">Logging in...</span>
+      </button>
+    </form>
+  </div>
+</div>

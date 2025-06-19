@@ -1,0 +1,239 @@
+<div class="purchase-bill-container">
+  <header class="app-header">
+    <div class="header-left">
+      <h1>📋 Purchase Bill</h1>
+      <p class="subtitle">Enter Information for the Purchase Bill</p>
+    </div>
+    <div class="header-right">
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="form-section">
+      <!-- Header Tabs -->
+      <div class="tabs">
+        <div class="tab">Header</div>
+        <div class="tab active">Details</div>
+        <div class="tab">Notes</div>
+        <div class="tab">Documents</div>
+      </div>
+
+      <!-- Sub Tabs -->
+      <div class="sub-tabs">
+        <div class="sub-tab active">Items</div>
+        <div class="sub-tab">Accounts</div>
+        <div class="sub-tab">Taxes</div>
+      </div>
+
+      <!-- Form -->
+      <div class="form-container">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="item">Item*</label>
+            <select 
+              id="item" 
+              [(ngModel)]="selectedItem" 
+              class="form-control"
+              required
+            >
+              <option value="">Select Item...</option>
+              <option *ngFor="let item of availableItems" [value]="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="batch">Batch</label>
+            <select 
+              id="batch" 
+              [(ngModel)]="selectedBatch" 
+              class="form-control"
+            >
+              <option value="">Select Batch...</option>
+              <option *ngFor="let batch of availableBatches" [value]="batch.Location_Name">{{ batch.Location_Name }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="standardCost">Standard Cost</label>
+            <input 
+              type="number" 
+              id="standardCost" 
+              [(ngModel)]="standardCost"
+              (ngModelChange)="onStandardCostChange()"
+              class="form-control"
+              step="0.01"
+              min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="standardPrice">Standard Price</label>
+            <input 
+              type="number" 
+              id="standardPrice" 
+              [(ngModel)]="standardPrice"
+              (ngModelChange)="onStandardPriceChange()"
+              class="form-control new-price"
+              step="0.01"
+              min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Qty</label>
+            <input 
+              type="number" 
+              id="quantity" 
+              [(ngModel)]="quantity"
+              (ngModelChange)="onQuantityChange()"
+              class="form-control"
+              min="1"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="discount">Discount</label>
+            <input 
+              type="number" 
+              id="discount" 
+              [(ngModel)]="discount"
+              (ngModelChange)="onDiscountChange()"
+              class="form-control"
+              step="0.01"
+              min="0"
+              max="100"
+            >
+          </div>
+
+          <div class="form-group">
+            <button 
+              type="button" 
+              class="add-btn"
+              (click)="addItem()"
+              [disabled]="!selectedItem || !selectedBatch || standardCost <= 0 || standardPrice <= 0"
+            >
+              Add +
+            </button>
+          </div>
+        </div>
+
+        <!-- Totals Row -->
+        <div class="totals-row">
+          <div class="total-item">
+            <label>Discount</label>
+            <span>{{ discount }}%</span>
+          </div>
+          <div class="total-item">
+            <label>Total Cost</label>
+            <span>{{ (standardCost * quantity * (1 - discount/100)) | number:'1.2-2' }}</span>
+          </div>
+          <div class="total-item">
+            <label>Total Selling</label>
+            <span>{{ (standardPrice * quantity) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div class="table-container" *ngIf="purchaseItems.length > 0">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Batch</th>
+              <th>Standard Cost</th>
+              <th>Standard Price</th>
+              <th>Margin</th>
+              <th>Qty</th>
+              <th>Free Qty</th>
+              <th>Discount</th>
+              <th>Total Cost</th>
+              <th>Total Selling</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of purchaseItems">
+              <td>{{ item.Item }}</td>
+              <td>{{ item.Batch }}</td>
+              <td>{{ item.StandardCost | number:'1.2-2' }}</td>
+              <td>{{ item.StandardPrice | number:'1.2-2' }}</td>
+              <td>{{ ((item.StandardPrice - item.StandardCost) / item.StandardCost * 100) | number:'1.2-2' }}%</td>
+              <td>{{ item.Quantity }}</td>
+              <td>0</td>
+              <td>{{ item.Discount }}%</td>
+              <td>{{ item.TotalCost | number:'1.2-2' }}</td>
+              <td>{{ item.TotalSelling | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="table-actions">
+          <button class="clear-btn" (click)="clearAllItems()">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="summary-card">
+        <h3>📊 Summary</h3>
+        
+        <div class="summary-item">
+          <h4>📝 Item Summary</h4>
+          <div class="summary-row">
+            <span>Total Items</span>
+            <span class="summary-value">{{ summary.TotalItems }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Total Qty</span>
+            <span class="summary-value">{{ summary.TotalQuantity }}</span>
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <h4>💰 Financial Summary</h4>
+          <div class="summary-row">
+            <span>Gross Total</span>
+            <span class="summary-value">{{ summary.GrossTotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Item Discount</span>
+            <span class="summary-value">{{ summary.TotalDiscount | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Overall Discount</span>
+            <span class="summary-value">0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Total Discounts</span>
+            <span class="summary-value">{{ summary.TotalDiscount | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Total Before Tax</span>
+            <span class="summary-value">{{ summary.NetTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <h4>📊 Tax Summary</h4>
+          <div class="summary-row">
+            <span>Total Tax</span>
+            <span class="summary-value">{{ (summary.NetTotal * 0.1) | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Suspended Tax</span>
+            <span class="summary-value">{{ (summary.NetTotal * 0.1) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="net-total">
+          <h4>💵 Net Total</h4>
+          <div class="net-amount">
+            Rs. {{ (summary.NetTotal + summary.NetTotal * 0.1) | number:'1.2-2' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
