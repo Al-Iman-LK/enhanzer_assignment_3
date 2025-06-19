@@ -12,6 +12,9 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './purchase-bill.component.css'
 })
 export class PurchaseBillComponent implements OnInit {
+  // Tab management
+  activeTab: string = 'details';
+  
   // Form data
   selectedItem: string = '';
   selectedBatch: string = '';
@@ -51,10 +54,10 @@ export class PurchaseBillComponent implements OnInit {
     this.loadPurchaseItems();
     this.loadSummary();
   }
-
   loadBatches(): void {
     this.databaseService.getLocations().subscribe({
       next: (locations) => {
+        console.log('Loaded locations:', locations);
         this.availableBatches = locations;
       },
       error: (error) => {
@@ -115,22 +118,44 @@ export class PurchaseBillComponent implements OnInit {
 
   onDiscountChange(): void {
     this.calculateTotals();
-  }
-
-  addItem(): void {
-    if (!this.selectedItem || !this.selectedBatch || this.standardCost <= 0 || this.standardPrice <= 0 || this.quantity <= 0) {
-      alert('Please fill all required fields with valid values');
+  }  addItem(): void {
+    console.log('Selected batch:', this.selectedBatch);
+    console.log('Available batches:', this.availableBatches);
+    
+    if (!this.selectedItem || !this.selectedBatch) {
+      alert('Please select both Item and Batch');
+      return;
+    }
+    
+    if (this.standardCost <= 0) {
+      alert('Standard Cost must be greater than 0');
+      return;
+    }
+    
+    if (this.standardPrice <= 0) {
+      alert('Standard Price must be greater than 0');
+      return;
+    }
+    
+    if (this.quantity <= 0) {
+      alert('Quantity must be greater than 0');
       return;
     }
 
-    const item: PurchaseBillItem = {
+    // Calculate totals
+    const totalCost = (this.standardCost * this.quantity) * (1 - this.discount / 100);
+    const totalSelling = this.standardPrice * this.quantity;    const item: PurchaseBillItem = {
       Item: this.selectedItem,
       Batch: this.selectedBatch,
       StandardCost: this.standardCost,
       StandardPrice: this.standardPrice,
       Quantity: this.quantity,
-      Discount: this.discount
+      Discount: this.discount,
+      TotalCost: totalCost,
+      TotalSelling: totalSelling
     };
+
+    console.log('Adding item:', item);
 
     this.databaseService.addPurchaseBillItem(item).subscribe({
       next: (response) => {
@@ -168,9 +193,15 @@ export class PurchaseBillComponent implements OnInit {
       });
     }
   }
-
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+  }
+
+  getCurrentDate(): string {
+    return new Date().toISOString().split('T')[0];
   }
 }

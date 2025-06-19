@@ -13,13 +13,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", builder =>
     {
-        builder.WithOrigins("http://localhost:4200", "http://localhost:4201")
+        builder.WithOrigins("http://localhost:4200", "http://localhost:4201", "http://localhost:57707")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keep original property names
+    });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

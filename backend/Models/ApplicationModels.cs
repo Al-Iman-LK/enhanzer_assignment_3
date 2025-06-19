@@ -10,7 +10,7 @@ namespace backend.Models
         public string Address { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public int Status { get; set; }
-    }    public class LoginRequest
+    }public class LoginRequest
     {
         [JsonPropertyName("API_Action")]
         public string API_Action { get; set; } = "GetLoginData";
@@ -30,14 +30,15 @@ namespace backend.Models
         public string Username { get; set; } = string.Empty;
         [JsonPropertyName("Pw")]
         public string Pw { get; set; } = string.Empty;
-    }
-
-    public class LoginResponse
+    }    public class LoginResponse
     {
+        [JsonPropertyName("Success")]
         public bool Success { get; set; }
+        [JsonPropertyName("Message")]
         public string Message { get; set; } = string.Empty;
+        [JsonPropertyName("User_Locations")]
         public List<UserLocation> User_Locations { get; set; } = new List<UserLocation>();
-    }    public class UserLocation
+    }public class UserLocation
     {
         [JsonPropertyName("Location_Code")]
         public string Location_Code { get; set; } = string.Empty;

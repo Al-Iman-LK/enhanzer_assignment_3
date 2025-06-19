@@ -69,9 +69,20 @@
   border-right: 1px solid #bdc3c7;
   color: #7f8c8d;
   font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background: #e8f4f8;
+  color: #2980b9;
 }
 
 .tab.active {
+  background: #3498db;
+  color: white;
+}
+
+.tab.active:hover {
   background: #3498db;
   color: white;
 }
@@ -112,6 +123,15 @@
 .form-group {
   display: flex;
   flex-direction: column;
+}
+
+.form-group.full-width {
+  flex: 1 1 100%;
+}
+
+.form-group.full-width textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .form-group label {
@@ -301,6 +321,28 @@
 .net-amount {
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+/* Tab Content Styles */
+.tab-content {
+  padding: 1rem 0;
+}
+
+.tab-content h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Document list styles */
+.document-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  text-align: center;
+  color: #666;
 }
 
 @media (max-width: 1200px) {

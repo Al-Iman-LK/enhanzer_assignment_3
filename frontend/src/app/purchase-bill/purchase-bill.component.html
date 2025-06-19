@@ -10,13 +10,36 @@
   </header>
 
   <div class="main-content">
-    <div class="form-section">
-      <!-- Header Tabs -->
+    <div class="form-section">      <!-- Header Tabs -->
       <div class="tabs">
-        <div class="tab">Header</div>
-        <div class="tab active">Details</div>
-        <div class="tab">Notes</div>
-        <div class="tab">Documents</div>
+        <div 
+          class="tab" 
+          [class.active]="activeTab === 'header'"
+          (click)="setActiveTab('header')"
+        >
+          Header
+        </div>
+        <div 
+          class="tab" 
+          [class.active]="activeTab === 'details'"
+          (click)="setActiveTab('details')"
+        >
+          Details
+        </div>
+        <div 
+          class="tab" 
+          [class.active]="activeTab === 'notes'"
+          (click)="setActiveTab('notes')"
+        >
+          Notes
+        </div>
+        <div 
+          class="tab" 
+          [class.active]="activeTab === 'documents'"
+          (click)="setActiveTab('documents')"
+        >
+          Documents
+        </div>
       </div>
 
       <!-- Sub Tabs -->
@@ -24,10 +47,29 @@
         <div class="sub-tab active">Items</div>
         <div class="sub-tab">Accounts</div>
         <div class="sub-tab">Taxes</div>
-      </div>
-
-      <!-- Form -->
+      </div>      <!-- Form -->
       <div class="form-container">
+        <!-- Header Tab Content -->
+        <div *ngIf="activeTab === 'header'" class="tab-content">
+          <h3>Purchase Bill Header Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bill Number</label>
+              <input type="text" class="form-control" placeholder="Auto-generated" readonly>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" class="form-control" [value]="getCurrentDate()">
+            </div>
+            <div class="form-group">
+              <label>Supplier</label>
+              <input type="text" class="form-control" placeholder="Enter supplier name">
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Tab Content (existing content) -->
+        <div *ngIf="activeTab === 'details'" class="tab-content">
         <div class="form-row">
           <div class="form-group">
             <label for="item">Item*</label>
@@ -40,9 +82,7 @@
               <option value="">Select Item...</option>
               <option *ngFor="let item of availableItems" [value]="item">{{ item }}</option>
             </select>
-          </div>
-
-          <div class="form-group">
+          </div>          <div class="form-group">
             <label for="batch">Batch</label>
             <select 
               id="batch" 
@@ -106,12 +146,11 @@
             >
           </div>
 
-          <div class="form-group">
-            <button 
+          <div class="form-group">            <button 
               type="button" 
               class="add-btn"
               (click)="addItem()"
-              [disabled]="!selectedItem || !selectedBatch || standardCost <= 0 || standardPrice <= 0"
+              [disabled]="!selectedItem || !selectedBatch || quantity <= 0"
             >
               Add +
             </button>
@@ -131,12 +170,10 @@
           <div class="total-item">
             <label>Total Selling</label>
             <span>{{ (standardPrice * quantity) | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Items Table -->
-      <div class="table-container" *ngIf="purchaseItems.length > 0">
+          </div>        </div>
+        
+        <!-- Items Table for Details Tab -->
+        <div class="table-container" *ngIf="activeTab === 'details' && purchaseItems.length > 0">
         <table class="items-table">
           <thead>
             <tr>
@@ -167,14 +204,44 @@
             </tr>
           </tbody>
         </table>
-        
-        <div class="table-actions">
+          <div class="table-actions">
           <button class="clear-btn" (click)="clearAllItems()">Clear All</button>
+        </div>
+      </div>
+        </div>
+
+        <!-- Notes Tab Content -->
+        <div *ngIf="activeTab === 'notes'" class="tab-content">
+          <h3>Purchase Bill Notes</h3>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Internal Notes</label>
+              <textarea class="form-control" rows="4" placeholder="Enter internal notes here..."></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>Customer Notes</label>
+              <textarea class="form-control" rows="4" placeholder="Enter customer-facing notes here..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Tab Content -->
+        <div *ngIf="activeTab === 'documents'" class="tab-content">
+          <h3>Purchase Bill Documents</h3>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Attach Documents</label>
+              <input type="file" class="form-control" multiple accept=".pdf,.doc,.docx,.jpg,.png">
+            </div>
+            <div class="document-list">
+              <p>No documents attached yet.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Summary Section -->
+    <!-- Summary Section (always visible) -->
     <div class="summary-section">
       <div class="summary-card">
         <h3>📊 Summary</h3>
